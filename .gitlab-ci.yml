@@ -1,0 +1,29 @@
+image: golang:1.11.2
+
+stages:
+    - test
+
+test:
+  stage: test
+  script:
+    - go test -v
+
+coverage:
+  stage: test
+  script:
+    - go test -cover -v
+
+# race_detector:
+#   stage: test
+#   script:
+#     - go test -race -short
+
+# memory_sanitizer:
+#   stage: test
+#   script:
+#     - go test -msan -short
+
+# lint_code:
+#   stage: test
+#   script:
+#     - golint -set_exit_status

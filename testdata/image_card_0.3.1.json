@@ -1,0 +1,16 @@
+{
+	"version": "0.3.1",
+	"atoms": [],
+	"cards": [
+		[
+			"image-card",
+			{
+				"src": "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACwAAAAAAQABAAACAkQBADs="
+			}
+		]
+	],
+	"markups": [],
+	"sections": [
+		[10, 0]
+	]
+}
