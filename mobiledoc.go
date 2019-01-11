@@ -22,11 +22,51 @@ const (
 	sectionCard   = 10
 )
 
-// RenderMarkdown renders the given Mobiledoc JSON and renders is as Markdown
-// into the given writer
-func RenderMarkdown(r io.Reader, w io.Writer) error {
+// Mobiledoc models the data required to render a mobiledoc document
+type Mobiledoc struct {
+	r     io.Reader
+	atoms map[string]Atom
+	cards map[string]Card
+	doc   doc
+	root  *node
+}
+
+// NewMobiledoc creates a new Mobiledoc instance
+func NewMobiledoc(src io.Reader) Mobiledoc {
+	return Mobiledoc{
+		r: src,
+		cards: map[string]Card{
+			"image-card": imagecard,
+		},
+	}
+}
+
+// WithAtom creates a new Mobiledoc instance that has a registered Atom
+func (md Mobiledoc) WithAtom(name string, atom Atom) Mobiledoc {
+	if md.atoms == nil {
+		md.atoms = make(map[string]Atom)
+	}
+	md.atoms[name] = atom
+	return md
+}
+
+// WithCard creates a new Mobiledoc instance that has a registered Card
+func (md Mobiledoc) WithCard(name string, card Card) Mobiledoc {
+	if md.cards == nil {
+		md.cards = make(map[string]Card)
+	}
+	md.cards[name] = card
+	return md
+}
+
+// Render the Mobiledoc is rendered to the given writer
+func (md *Mobiledoc) Render(w io.Writer) error {
+	if md.root != nil {
+		return md.root.renderMarkdown(w)
+	}
+
 	var mdmap map[string]json.RawMessage
-	decoder := json.NewDecoder(r)
+	decoder := json.NewDecoder(md.r)
 	err := decoder.Decode(&mdmap)
 	if err != nil {
 		return errors.Wrap(err, "unable to decode mobiledoc json")
@@ -45,12 +85,13 @@ func RenderMarkdown(r io.Reader, w io.Writer) error {
 
 	switch version {
 	case "0.3.0", "0.3.1":
-		n, err := parseV03(mdmap)
+		n, err := md.parseV03(mdmap)
 		if err != nil {
 			return errors.Wrap(err, "unable to parse mobiledoc")
 		}
-		return n.renderMarkdown(w)
+		md.root = n
 	default:
 		return fmt.Errorf("unknown version %s", version)
 	}
+	return md.root.renderMarkdown(w)
 }

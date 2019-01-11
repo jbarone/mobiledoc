@@ -2,6 +2,8 @@ package mobiledoc
 
 import (
 	"encoding/json"
+	"fmt"
+	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -112,4 +114,41 @@ func (m *marker) UnmarshalJSON(b []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (md Mobiledoc) openMarker(n *node, m marker) (*node, []*node, error) {
+	var nodes []*node
+	for _, o := range m.openIndexes {
+		if o > len(md.doc.markups) {
+			return nil, nil, fmt.Errorf("unknown markup %d", o)
+		}
+
+		nodeMarkup := md.doc.markups[o]
+
+		switch strings.ToLower(nodeMarkup.tagName) {
+		case BOLD, ITALIC, STRONG, EMPHASIS, ANCHOR, UNDERLINE,
+			SUBSCRIPT, SUPERSCRIPT, STRIKETHROUGH:
+			// do nothing - valid tag
+		default:
+			m.closeCount--
+			continue
+		}
+
+		node := nodeMarkup.createNode()
+		n.addChild(node)
+		nodes = append(nodes, node)
+		n = node
+	}
+
+	return n, nodes, nil
+}
+
+func (md Mobiledoc) closeMarker(
+	n *node, nodes []*node, m marker,
+) (*node, []*node) {
+	for i := 0; i < m.closeCount; i++ {
+		nodes = nodes[:len(nodes)-1]
+		n = nodes[len(nodes)-1]
+	}
+	return n, nodes
 }

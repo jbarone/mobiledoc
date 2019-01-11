@@ -3,55 +3,23 @@ package mobiledoc
 import (
 	"encoding/json"
 	"fmt"
-	"sync"
 
 	"github.com/pkg/errors"
 )
 
-// CardRenderer renders a Card to the registered format
-type CardRenderer func(payload interface{}) string
+// Card renders a Card
+type Card func(payload interface{}) string
 
-var cards map[string]map[string]CardRenderer
-var cardsLock sync.Mutex
-
-func init() {
-	RegisterCardRenderer(
-		"image-card",
-		"markdown",
-		func(payload interface{}) string {
-			m, ok := payload.(map[string]interface{})
-			if !ok {
-				return ""
-			}
-			src, ok := m["src"]
-			if !ok {
-				return ""
-			}
-			return fmt.Sprintf("![](%s)", src.(string))
-		},
-	)
-}
-
-// RegisterCardRenderer registers a CardRenderer for a specific render type
-//
-// NOTE: currently only "markdown" is accepted as renderType
-func RegisterCardRenderer(name, renderType string, renderer CardRenderer) {
-	if renderType != "markdown" {
-		panic(fmt.Sprintf("unsupported render type %s", renderType))
+func imagecard(payload interface{}) string {
+	m, ok := payload.(map[string]interface{})
+	if !ok {
+		return ""
 	}
-
-	cardsLock.Lock()
-	defer cardsLock.Unlock()
-
-	if cards == nil {
-		cards = make(map[string]map[string]CardRenderer)
+	src, ok := m["src"]
+	if !ok {
+		return ""
 	}
-
-	if _, ok := cards[renderType]; !ok {
-		cards[renderType] = make(map[string]CardRenderer)
-	}
-
-	cards[renderType][name] = renderer
+	return fmt.Sprintf("![](%s)", src.(string))
 }
 
 type card struct {
@@ -59,7 +27,7 @@ type card struct {
 	payload interface{}
 }
 
-// UnmarshalJSON decodes the Card and stores in *c
+// UnmarshalJSON decodes the Card JSON
 func (c *card) UnmarshalJSON(b []byte) error {
 	var tmp []json.RawMessage
 	err := json.Unmarshal(b, &tmp)
@@ -78,28 +46,25 @@ func (c *card) UnmarshalJSON(b []byte) error {
 
 	err = json.Unmarshal(tmp[1], &c.payload)
 	if err != nil {
-		return errors.Wrap(err, "unable to unmarshal card value")
+		return errors.Wrap(err, "unable to unmarshal card payload")
 	}
 
 	return nil
 }
 
 // Render the card to the specified format
-func (c *card) Render(renderType string) (*node, error) {
-	if cards == nil {
+func (md *Mobiledoc) renderCard(c *card) (*node, error) {
+	if md.cards == nil {
 		return nil, fmt.Errorf("unable to locate renderer for card %q", c.name)
 	}
 
-	if _, ok := cards[renderType]; !ok {
-		return nil, fmt.Errorf("unable to locate renderer for card %q", c.name)
-	}
-
-	if _, ok := cards[renderType][c.name]; !ok {
+	renderer, ok := md.cards[c.name]
+	if !ok {
 		return nil, fmt.Errorf("unable to locate renderer for card %q", c.name)
 	}
 
 	wrapper := newNode("div", "")
-	render := newNode("", cards[renderType][c.name](c.payload))
+	render := newNode("", renderer(c.payload))
 	wrapper.addChild(render)
 
 	return wrapper, nil
