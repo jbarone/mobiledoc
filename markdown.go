@@ -27,14 +27,25 @@ func (n *node) renderEnd(w io.Writer) error {
 		if src, ok := n.attributes["src"]; ok {
 			_, err = fmt.Fprintf(w, "(%s)", src)
 		}
-	case LISTITEM, H1, H2, H3, H4, PARAGRAPH, BLOCKQUOTE:
+	case LISTITEM, ORDEREDLIST, UNORDEREDLIST:
 		_, err = fmt.Fprint(w, "\n")
+	case H1, H2, H3, H4, PARAGRAPH, BLOCKQUOTE:
+		_, err = fmt.Fprint(w, "\n\n")
 	}
 
 	return err
 }
 
-// nolint [: gocyclo]
+func (n *node) renderListItemStart(w io.Writer) error {
+	var err error
+	if pos, ok := n.attributes["position"]; ok {
+		_, err = fmt.Fprintf(w, "%s. ", pos)
+	} else {
+		_, err = fmt.Fprint(w, "* ")
+	}
+	return err
+}
+
 func (n *node) renderStart(w io.Writer) error {
 	var err error
 	switch strings.ToLower(n.tagname) {
@@ -55,11 +66,7 @@ func (n *node) renderStart(w io.Writer) error {
 	case IMAGE:
 		_, err = fmt.Fprint(w, "![")
 	case LISTITEM:
-		if pos, ok := n.attributes["position"]; ok {
-			_, err = fmt.Fprintf(w, "%s. ", pos)
-		} else {
-			_, err = fmt.Fprint(w, "* ")
-		}
+		err = n.renderListItemStart(w)
 	case BLOCKQUOTE:
 		_, err = fmt.Fprint(w, "> ")
 	}

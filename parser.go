@@ -116,11 +116,11 @@ func (m *marker) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func (md Mobiledoc) openMarker(n *node, m marker) (*node, []*node, error) {
+func (md Mobiledoc) openMarker(n *node, m marker) (*node, []*node, marker, error) {
 	var nodes []*node
 	for _, o := range m.openIndexes {
 		if o > len(md.doc.markups) {
-			return nil, nil, fmt.Errorf("unknown markup %d", o)
+			return nil, nil, m, fmt.Errorf("unknown markup %d", o)
 		}
 
 		nodeMarkup := md.doc.markups[o]
@@ -140,7 +140,7 @@ func (md Mobiledoc) openMarker(n *node, m marker) (*node, []*node, error) {
 		n = node
 	}
 
-	return n, nodes, nil
+	return n, nodes, m, nil
 }
 
 func (md Mobiledoc) closeMarker(

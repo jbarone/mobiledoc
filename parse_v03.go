@@ -201,12 +201,13 @@ func (md *Mobiledoc) addMarkersToNode(
 			return err
 		}
 
-		node, openNodes, err := md.openMarker(n, mark)
+		node, openNodes, m, err := md.openMarker(n, mark)
 		if err != nil {
 			return err
 		}
 		nodes = append(nodes, openNodes...)
 		n = node
+		mark = m
 
 		switch mark.markerType {
 		case markerMarkup:

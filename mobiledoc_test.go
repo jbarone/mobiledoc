@@ -139,8 +139,7 @@ func TestRenderMarkdown_errors(t *testing.T) {
 						[
 							"missing-card",
 							{
-								"src": "data:image/gif;base64,R0lGODlhAQAB" +
-								"AIAAAP///wAAACwAAAAAAQABAAACAkQBADs="
+								"src": "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACwAAAAAAQABAAACAkQBADs="
 							}
 						]
 					],
