@@ -135,7 +135,7 @@ func (md Mobiledoc) openMarker(n *node, m marker) (*node, []*node, marker, error
 		}
 
 		node := nodeMarkup.createNode()
-		n.addChild(node)
+		n.appendChild(node)
 		nodes = append(nodes, node)
 		n = node
 	}

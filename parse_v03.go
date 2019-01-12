@@ -48,7 +48,7 @@ func (md *Mobiledoc) parseSectionImage(root *node, s []json.RawMessage) error {
 	}
 	n := newNode(IMAGE, "")
 	n.addAttribute("src", url)
-	root.addChild(n)
+	root.appendChild(n)
 	return nil
 }
 
@@ -83,10 +83,10 @@ func (md *Mobiledoc) parseSectionList(root *node, s []json.RawMessage) error {
 			return err
 		}
 
-		n.addChild(li)
+		n.appendChild(li)
 	}
 
-	root.addChild(n)
+	root.appendChild(n)
 	return nil
 }
 
@@ -109,7 +109,7 @@ func (md *Mobiledoc) parseSectionMarkup(root *node, s []json.RawMessage) error {
 		return err
 	}
 
-	root.addChild(n)
+	root.appendChild(n)
 	return err
 }
 
@@ -124,7 +124,7 @@ func (md *Mobiledoc) parseSectionCard(root *node, s []json.RawMessage) error {
 	if err != nil {
 		return err
 	}
-	root.addChild(n)
+	root.appendChild(n)
 	return nil
 }
 
@@ -211,14 +211,14 @@ func (md *Mobiledoc) addMarkersToNode(
 
 		switch mark.markerType {
 		case markerMarkup:
-			n.addChild(newNode(TEXT, mark.value.(string)))
+			n.appendChild(newNode(TEXT, mark.value.(string)))
 		case markerAtom:
 			atom := md.doc.atoms[int(mark.value.(float64))]
 			a, err := md.renderAtom(&atom)
 			if err != nil {
 				return err
 			}
-			n.addChild(a)
+			n.appendChild(a)
 		}
 
 		n, nodes = md.closeMarker(n, nodes, mark)

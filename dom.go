@@ -1,8 +1,9 @@
 package mobiledoc
 
 type node struct {
+	parent, firstChild, lastChild, prevSibling, nextSibling *node
+
 	tagname, value string
-	children       []*node
 	attributes     map[string]string
 }
 
@@ -14,10 +15,25 @@ func newNode(tagname, value string) *node {
 	}
 }
 
-func (e *node) addChild(c *node) {
-	e.children = append(e.children, c)
+// appendChild adds a node c as a child of n.
+//
+// It will panic if c already has a parent or siblings.
+func (n *node) appendChild(c *node) {
+	if c.parent != nil || c.prevSibling != nil || c.nextSibling != nil {
+		panic("node: appendChild called for an attached child Node")
+	}
+	last := n.lastChild
+	if last != nil {
+		last.nextSibling = c
+	} else {
+		n.firstChild = c
+	}
+	n.lastChild = c
+	c.parent = n
+	c.prevSibling = last
 }
 
-func (e *node) addAttribute(key, value string) {
-	e.attributes[key] = value
+// addAttribute adds an attribute key with value value.
+func (n *node) addAttribute(key, value string) {
+	n.attributes[key] = value
 }

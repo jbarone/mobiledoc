@@ -65,7 +65,7 @@ func (md *Mobiledoc) renderCard(c *card) (*node, error) {
 
 	wrapper := newNode("div", "")
 	render := newNode("", renderer(c.payload))
-	wrapper.addChild(render)
+	wrapper.appendChild(render)
 
 	return wrapper, nil
 }
