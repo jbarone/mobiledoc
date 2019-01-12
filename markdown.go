@@ -12,7 +12,7 @@ func (n *node) renderEnd(w io.Writer) error {
 	case BOLD, STRONG:
 		_, err = fmt.Fprint(w, "**")
 	case ITALIC, EMPHASIS:
-		_, err = fmt.Fprint(w, "*")
+		_, err = fmt.Fprint(w, "_")
 	case ANCHOR:
 		if _, err = fmt.Fprint(w, "]"); err != nil {
 			return err
@@ -52,7 +52,7 @@ func (n *node) renderStart(w io.Writer) error {
 	case BOLD, STRONG:
 		_, err = fmt.Fprint(w, "**")
 	case ITALIC, EMPHASIS:
-		_, err = fmt.Fprint(w, "*")
+		_, err = fmt.Fprint(w, "_")
 	case H1:
 		_, err = fmt.Fprint(w, "# ")
 	case H2:
