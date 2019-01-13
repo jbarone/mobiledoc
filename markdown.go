@@ -21,6 +21,8 @@ func (n *node) renderStart(w io.Writer) error {
 	switch strings.ToLower(n.tagname) {
 	case BOLD, STRONG:
 		_, err = fmt.Fprint(w, "**")
+	case CODE:
+		_, err = fmt.Fprint(w, "`")
 	case ITALIC, EMPHASIS:
 		_, err = fmt.Fprint(w, "_")
 	case H1:
@@ -49,6 +51,8 @@ func (n *node) renderEnd(w io.Writer) error {
 	switch strings.ToLower(n.tagname) {
 	case BOLD, STRONG:
 		_, err = fmt.Fprint(w, "**")
+	case CODE:
+		_, err = fmt.Fprint(w, "`")
 	case ITALIC, EMPHASIS:
 		_, err = fmt.Fprint(w, "_")
 	case ANCHOR:
@@ -67,21 +71,44 @@ func (n *node) renderEnd(w io.Writer) error {
 		}
 	case LISTITEM, ORDEREDLIST, UNORDEREDLIST:
 		_, err = fmt.Fprint(w, "\n")
-	case H1, H2, H3, H4, PARAGRAPH, BLOCKQUOTE:
+	case H1, H2, H3, H4, PARAGRAPH, BLOCKQUOTE, DIV:
 		_, err = fmt.Fprint(w, "\n\n")
 	}
 
 	return err
 }
 
-func (n *node) rednerSpace(w io.Writer) error {
+func (n *node) rednerSpaceStart(w io.Writer) error {
 	var err error
 
 	switch strings.ToLower(n.tagname) {
-	case LISTITEM, ORDEREDLIST, UNORDEREDLIST, H1, H2, H3, H4, PARAGRAPH, BLOCKQUOTE:
+	case LISTITEM, ORDEREDLIST, UNORDEREDLIST, H1, H2, H3, H4, PARAGRAPH, BLOCKQUOTE, DIV:
 		// do nothing
 	default:
-		_, err = fmt.Fprint(w, " ")
+		for ; n != nil; n = n.lastChild {
+			if strings.HasPrefix(n.value, " ") {
+				_, err = fmt.Fprint(w, " ")
+				break
+			}
+		}
+	}
+
+	return err
+}
+
+func (n *node) rednerSpaceEnd(w io.Writer) error {
+	var err error
+
+	switch strings.ToLower(n.tagname) {
+	case LISTITEM, ORDEREDLIST, UNORDEREDLIST, H1, H2, H3, H4, PARAGRAPH, BLOCKQUOTE, DIV:
+		// do nothing
+	default:
+		for ; n != nil; n = n.lastChild {
+			if strings.HasSuffix(n.value, " ") {
+				_, err = fmt.Fprint(w, " ")
+				break
+			}
+		}
 	}
 
 	return err
@@ -94,11 +121,16 @@ func (n *node) renderContent(w io.Writer) error {
 		return err
 	}
 	for c := n.firstChild; c != nil; c = c.nextSibling {
+		if c != n.firstChild {
+			if err = c.rednerSpaceStart(w); err != nil {
+				return err
+			}
+		}
 		if err = c.renderMarkdown(w); err != nil {
 			return err
 		}
 		if c.nextSibling != nil {
-			if err = c.rednerSpace(w); err != nil {
+			if err = c.rednerSpaceEnd(w); err != nil {
 				return err
 			}
 		}

@@ -11,6 +11,7 @@ import (
 // Tag Types
 const (
 	BOLD          = "b"
+	CODE          = "code"
 	STRONG        = "strong"
 	ITALIC        = "i"
 	EMPHASIS      = "em"
@@ -127,7 +128,7 @@ func (md Mobiledoc) openMarker(n *node, m marker) (*node, []*node, marker, error
 
 		switch strings.ToLower(nodeMarkup.tagName) {
 		case BOLD, ITALIC, STRONG, EMPHASIS, ANCHOR, UNDERLINE,
-			SUBSCRIPT, SUPERSCRIPT, STRIKETHROUGH:
+			SUBSCRIPT, SUPERSCRIPT, STRIKETHROUGH, CODE:
 			// do nothing - valid tag
 		default:
 			m.closeCount--

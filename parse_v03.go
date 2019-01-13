@@ -162,7 +162,7 @@ func (md *Mobiledoc) parseSection(root *node, s []json.RawMessage) error {
 func (md *Mobiledoc) parseV03(
 	mdmap map[string]json.RawMessage,
 ) (*node, error) {
-	root := newNode(DIV, "")
+	root := newNode("root", "")
 
 	d, err := parseDoc(mdmap)
 	if err != nil {

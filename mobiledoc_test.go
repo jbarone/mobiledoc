@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"testing"
 )
@@ -103,6 +104,99 @@ func TestRender_WithAtom(t *testing.T) {
 	)
 
 	render(t, md, w, wantFile)
+}
+
+func atomSoftReturn(value string, payload interface{}) string {
+	return "\n"
+}
+
+func cardMarkdown(payload interface{}) string {
+	m, ok := payload.(map[string]interface{})
+	if !ok {
+		return ""
+	}
+	if markdown, ok := m["markdown"]; ok {
+		return fmt.Sprintf("%s\n", markdown.(string))
+	}
+	return ""
+}
+
+func cardImage(payload interface{}) string {
+	m, ok := payload.(map[string]interface{})
+	if !ok {
+		return ""
+	}
+
+	src, ok := m["src"]
+	if !ok {
+		return ""
+	}
+
+	if caption, ok := m["caption"]; ok {
+		return fmt.Sprintf(
+			"{{< figure src=\"%s\" caption=\"%s\" >}}\n\n",
+			src,
+			caption,
+		)
+	}
+
+	return fmt.Sprintf("{{< figure src=\"%s\" >}}\n\n", src)
+}
+
+func cardHR(payload interface{}) string {
+	return "---\n\n"
+}
+
+func cardCode(payload interface{}) string {
+	m, ok := payload.(map[string]interface{})
+	if !ok {
+		return ""
+	}
+
+	var buf bytes.Buffer
+
+	buf.WriteString("```")
+	if lang, ok := m["language"]; ok {
+		buf.WriteString(lang.(string))
+	}
+	buf.WriteString("\n")
+	buf.WriteString(m["code"].(string))
+	buf.WriteString("\n```\n")
+
+	return buf.String()
+}
+
+func TestRender_ghost(t *testing.T) {
+	m, err := filepath.Glob("testdata/ghost_*.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	sort.Strings(m)
+
+	for _, file := range m {
+		name := strings.TrimSuffix(filepath.Base(file), ".json")
+		t.Run(
+			name,
+			func(t *testing.T) {
+				r, err := os.Open(filepath.Join(file))
+				if err != nil {
+					t.Fatal(err)
+				}
+				wantFile := filepath.Join("testdata", "markdown", name+".md")
+				md := NewMobiledoc(r).
+					WithAtom("soft-break", atomSoftReturn).
+					WithAtom("soft-return", atomSoftReturn).
+					WithCard("card-markdown", cardMarkdown).
+					WithCard("markdown", cardMarkdown).
+					WithCard("hr", cardHR).
+					WithCard("image", cardImage).
+					WithCard("code", cardCode)
+
+				w := &bytes.Buffer{}
+				render(t, md, w, wantFile)
+			},
+		)
+	}
 }
 
 func TestRenderMarkdown_errors(t *testing.T) {
