@@ -19,7 +19,7 @@ since understanding Mobiledoc was now necessary.
 
 ## Build status
 
-[![GitHub release](https://img.shields.io/github/release/jbarone/ghostToHugo.svg)](https://github.com/jbarone/ghostToHugo/releases/latest)
+[![GitHub release](https://img.shields.io/github/release/jbarone/mobiledoc.svg)](https://github.com/jbarone/mobiledoc/releases/latest)
 [![Build Status](https://travis-ci.org/jbarone/mobiledoc.svg?branch=master)](https://travis-ci.org/jbarone/mobiledoc)
 [![Go Report Card](https://goreportcard.com/badge/github.com/jbarone/mobiledoc)](https://goreportcard.com/report/github.com/jbarone/mobiledoc)
 
