@@ -23,10 +23,6 @@ since understanding Mobiledoc was now necessary.
 [![Build Status](https://travis-ci.org/jbarone/mobiledoc.svg?branch=master)](https://travis-ci.org/jbarone/mobiledoc)
 [![Go Report Card](https://goreportcard.com/badge/github.com/jbarone/mobiledoc)](https://goreportcard.com/report/github.com/jbarone/mobiledoc)
 
-## Features
-
-What makes your project stand out?
-
 ## Code Example
 
 Show what the library does as concisely as possible, developers should be able
@@ -61,12 +57,6 @@ Tests are written using the standard go testing package.
 ```
 $ go test
 ```
-
-## Contribute
-
-Let people know how they can contribute into your project. A [contributing
-guideline](https://github.com/zulip/zulip-electron/blob/master/CONTRIBUTING.md)
-will be a big plus.
 
 ## Credits
 
