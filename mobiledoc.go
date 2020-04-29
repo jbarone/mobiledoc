@@ -84,7 +84,7 @@ func (md *Mobiledoc) Render(w io.Writer) error {
 	}
 
 	switch version {
-	case "0.3.0", "0.3.1":
+	case "0.3.0", "0.3.1", "0.3.2":
 		n, err := md.parseV03(mdmap)
 		if err != nil {
 			return errors.Wrap(err, "unable to parse mobiledoc")

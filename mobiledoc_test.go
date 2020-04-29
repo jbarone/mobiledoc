@@ -61,6 +61,7 @@ func TestRender(t *testing.T) {
 	tests := []string{
 		"empty_0.3.0",
 		"empty_0.3.1",
+		"empty_0.3.2",
 		"image_section_0.3.0",
 		"image_section_0.3.1",
 		"without_markup_0.3.0",
@@ -72,6 +73,7 @@ func TestRender(t *testing.T) {
 		"multi_marker_section_0.3.1",
 		"list_section_0.3.1",
 		"image_card_0.3.1",
+		"section_attributes_0.3.2",
 	}
 	for _, tt := range tests {
 		t.Run(tt, func(t *testing.T) {
