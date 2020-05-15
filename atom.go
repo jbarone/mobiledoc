@@ -2,9 +2,8 @@ package mobiledoc
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
-
-	"github.com/pkg/errors"
 )
 
 // Atom renders an Atom
@@ -21,7 +20,7 @@ func (a *atom) UnmarshalJSON(b []byte) error {
 	var tmp []json.RawMessage
 	err := json.Unmarshal(b, &tmp)
 	if err != nil {
-		return errors.Wrap(err, "unable to unmarshal atom")
+		return fmt.Errorf("unable to unmarshal atom: %w", err)
 	}
 
 	if len(tmp) != 3 {
@@ -30,17 +29,17 @@ func (a *atom) UnmarshalJSON(b []byte) error {
 
 	err = json.Unmarshal(tmp[0], &a.name)
 	if err != nil {
-		return errors.Wrap(err, "unable to unmarshal atom name")
+		return fmt.Errorf("unable to unmarshal atom: %w", err)
 	}
 
 	err = json.Unmarshal(tmp[1], &a.value)
 	if err != nil {
-		return errors.Wrap(err, "unable to unmarshal atom value")
+		return fmt.Errorf("unable to unmarshal atom: %w", err)
 	}
 
 	err = json.Unmarshal(tmp[2], &a.payload)
 	if err != nil {
-		return errors.Wrap(err, "unable to unmarshal atom payload")
+		return fmt.Errorf("unable to unmarshal atom: %w", err)
 	}
 
 	return nil

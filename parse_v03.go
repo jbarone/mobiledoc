@@ -2,10 +2,9 @@ package mobiledoc
 
 import (
 	"encoding/json"
+	"errors"
 	"strconv"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 type doc struct {

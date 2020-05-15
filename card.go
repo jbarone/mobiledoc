@@ -2,9 +2,8 @@ package mobiledoc
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
-
-	"github.com/pkg/errors"
 )
 
 // Card renders a Card
@@ -32,7 +31,7 @@ func (c *card) UnmarshalJSON(b []byte) error {
 	var tmp []json.RawMessage
 	err := json.Unmarshal(b, &tmp)
 	if err != nil {
-		return errors.Wrap(err, "unable to unmarshal card")
+		return fmt.Errorf("unable to unmarshal card: %w", err)
 	}
 
 	if len(tmp) != 2 {
@@ -41,12 +40,12 @@ func (c *card) UnmarshalJSON(b []byte) error {
 
 	err = json.Unmarshal(tmp[0], &c.name)
 	if err != nil {
-		return errors.Wrap(err, "unable to unmarshal card name")
+		return fmt.Errorf("unable to unmarshal card name: %w", err)
 	}
 
 	err = json.Unmarshal(tmp[1], &c.payload)
 	if err != nil {
-		return errors.Wrap(err, "unable to unmarshal card payload")
+		return fmt.Errorf("unable to unmarshal card payload: %w", err)
 	}
 
 	return nil

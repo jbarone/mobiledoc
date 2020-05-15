@@ -2,10 +2,9 @@ package mobiledoc
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 // Tag Types
@@ -43,7 +42,7 @@ func (m *markup) UnmarshalJSON(b []byte) error {
 	var tmp []json.RawMessage
 	err := json.Unmarshal(b, &tmp)
 	if err != nil {
-		return errors.Wrap(err, "unable to unmarshal markup")
+		return fmt.Errorf("unable to unmarshal markup: %w", err)
 	}
 
 	if len(tmp) == 0 {
@@ -53,7 +52,7 @@ func (m *markup) UnmarshalJSON(b []byte) error {
 	var tag string
 	err = json.Unmarshal(tmp[0], &tag)
 	if err != nil {
-		return errors.Wrap(err, "unable to unmarshal markup tag name")
+		return fmt.Errorf("unable to unmarshal markup tag name: %w", err)
 	}
 	m.tagName = tag
 
@@ -64,7 +63,7 @@ func (m *markup) UnmarshalJSON(b []byte) error {
 	var attributes []string
 	err = json.Unmarshal(tmp[1], &attributes)
 	if err != nil {
-		return errors.Wrap(err, "unable to unmarshal markup attributes")
+		return fmt.Errorf("unable to unmarshal markup attributes: %w", err)
 	}
 	if len(attributes)%2 != 0 {
 		return errors.New("markup attributes must be in pairs")

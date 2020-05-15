@@ -2,10 +2,9 @@ package mobiledoc
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
-
-	"github.com/pkg/errors"
 )
 
 // Marker constants
@@ -69,7 +68,7 @@ func (md *Mobiledoc) Render(w io.Writer) error {
 	decoder := json.NewDecoder(md.r)
 	err := decoder.Decode(&mdmap)
 	if err != nil {
-		return errors.Wrap(err, "unable to decode mobiledoc json")
+		return fmt.Errorf("unable to decode mobiledoc json: %w", err)
 	}
 
 	verInt, ok := mdmap["version"]
@@ -80,14 +79,14 @@ func (md *Mobiledoc) Render(w io.Writer) error {
 	var version string
 	err = json.Unmarshal(verInt, &version)
 	if err != nil {
-		return errors.Wrap(err, "not valid mobiledoc: version string")
+		return fmt.Errorf("not valid mobiledoc: version string: %w", err)
 	}
 
 	switch version {
 	case "0.3.0", "0.3.1", "0.3.2":
 		n, err := md.parseV03(mdmap)
 		if err != nil {
-			return errors.Wrap(err, "unable to parse mobiledoc")
+			return fmt.Errorf("unable to parse mobiledoc: %w", err)
 		}
 		md.root = n
 	default:
